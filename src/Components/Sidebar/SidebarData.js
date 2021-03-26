@@ -8,11 +8,11 @@ const items = [
     name: "Clients",
     label: "Clients",
     items: [
-      { name: "New Client", label: "New Client", path: "/NewClient" },
+      { name: "New Client", label: "New Client", path: "/Newclient" },
       {
         name: "Manage Clients",
         label: "Manage Clients",
-        path: "/ManageClients",
+        path: "ManageClients",
       },
     ],
   },
@@ -22,9 +22,9 @@ const items = [
     items: [
       { name: "New Project", label: "New Project", path: "/NewProject" },
       {
-        name: "Manage Clients",
-        label: "Manage Clients",
-        path: "/Clients",
+        name: "Manage Projects",
+        label: "Manage Projects",
+        path: "/ManageProjects",
       },
     ],
   },
@@ -45,9 +45,9 @@ const items = [
     label: "Tests",
     items: [
       {
-        name: "Assign Tests",
-        label: "Assign Tests",
-        path: "/AssignTests",
+        name: "Add Test",
+        label: "Add Test",
+        path: "/AddTest",
       },
       {
         name: "Tests Records",

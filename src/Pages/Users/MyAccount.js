@@ -82,8 +82,13 @@ function Edituser({ UserData, update }) {
     const formData = new FormData();
     formData.append("firstname", firstname);
     formData.append("lastname", lastname);
-    formData.append("email", email);
-    formData.append("mobile", "+" + phoneValue);
+    if (email !== UserData.email) {
+      formData.append("email", email);
+    }
+    formData.append(
+      "mobile",
+      phoneValue[0] === "+" ? phoneValue : "+" + phoneValue
+    );
     if (password !== "") {
       formData.append("password", password);
     }

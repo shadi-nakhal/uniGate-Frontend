@@ -1,44 +1,47 @@
 import React, { useState, useEffect } from "react";
-import { XGrid } from "@material-ui/x-grid";
 import { makeStyles } from "@material-ui/core/styles";
-import Avatar from "@material-ui/core/Avatar";
+import { XGrid } from "@material-ui/x-grid";
 import { Button } from "@material-ui/core";
 import CookieService from "../../Service/CookieService";
 import Typography from "@material-ui/core/Typography";
-import EditUser from "./Edituser";
+import NativeSelect from "@material-ui/core/NativeSelect";
+import EditClient from "./Editclient";
 import axios from "axios";
 
-function ManageUser({ update }) {
-  const [Users, setUsers] = useState([]);
+function ManageClient() {
+  const [Client, setClient] = useState([]);
   const [Loading, setLoading] = useState(true);
   const [Editing, setEditing] = useState(false);
-  const [UserData, setUserData] = useState({});
+  const [ClientData, setClientData] = useState({});
   const useStyles = makeStyles((theme) => ({
-    usersTable: {
+    ClientTable: {
       zIndex: "0",
       height: "78vh",
       scroll: "none",
-      width: "100%",
+      color: "red",
     },
     title: {
       marginBottom: "1%",
       marginTop: "1%",
       textAlign: "center",
     },
+    selectEmpty: {
+      marginTop: theme.spacing(0),
+      height: "100%",
+    },
   }));
-  const usersTable = useStyles();
+  const ClientTable = useStyles();
   const cookie = CookieService.get("Bearer");
-  const linkkk = "http://localhost:8000/storage/images/";
 
   const HandleEdit = () => {
     setEditing(!Editing);
   };
 
-  const loadUsers = async () => {
+  const loadClient = async () => {
     setLoading(true);
     var config = {
       method: "get",
-      url: "usersearch",
+      url: "/clients",
       headers: {
         Authorization: `Bearer ${cookie}`,
         "Content-Type": "application/x-www-form-urlencoded",
@@ -46,13 +49,14 @@ function ManageUser({ update }) {
     };
     await axios(config)
       .then((res) => {
-        setUsers(
+        setClient(
           res.data.map((item, index) => {
             return {
               ...item,
               delete: { id: item.id, image: item.image },
               edit: { id: item.id, index: index },
-              image: linkkk + item.image,
+              address: item.address,
+              project: item.projects,
             };
           })
         );
@@ -63,11 +67,11 @@ function ManageUser({ update }) {
     setLoading(false);
   };
 
-  const DeleteUser = async (id) => {
+  const DeleteClient = async (id) => {
     setLoading(true);
     var config = {
       method: "Delete",
-      url: `/user/${id}`,
+      url: `/client/${id}`,
       headers: {
         Authorization: `Bearer ${cookie}`,
         "Content-Type": "application/x-www-form-urlencoded",
@@ -75,7 +79,7 @@ function ManageUser({ update }) {
     };
     axios(config)
       .then((res) => {
-        loadUsers();
+        loadClient();
         console.log(res);
       })
       .catch((err) => {
@@ -85,49 +89,58 @@ function ManageUser({ update }) {
   };
 
   useEffect(() => {
-    loadUsers();
+    loadClient();
   }, [Editing]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 65 },
-    {
-      field: "image",
-      headerName: "Picture",
-      width: 100,
-      sortable: false,
-      renderCell: (params) => (
-        <Avatar
-          style={{ width: "1", height: "1" }}
-          alt="Remy Sharp"
-          src={params.value}
-        />
-      ),
-    },
+    { field: "id", headerName: "ID", width: 55 },
     {
       field: "fullName",
-      headerName: "Full name",
-      width: 180,
-      valueGetter: (params) =>
-        `${params.getValue("firstname") || ""} ${
-          params.getValue("lastname") || ""
-        }`,
+      headerName: "Fullname",
+      width: 150,
+      valueGetter: (params) => `${params.getValue("name")}`,
     },
 
-    { field: "role", headerName: "Role", width: 170 },
-    { field: "email", headerName: "Email", width: 200 },
-    { field: "mobile", headerName: "Phone", width: 200 },
-    { field: "ext", headerName: "Ext", width: 200 },
+    { field: "email", headerName: "Email", width: 180 },
+    { field: "phone", headerName: "Phone", width: 120 },
+    {
+      field: "address",
+      headerName: "Address",
+      width: 230,
+    },
+    {
+      field: "projects",
+      headerName: "Projects",
+      width: 180,
+      renderCell: (params) => (
+        <NativeSelect
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          className={ClientTable.selectEmpty}
+          value={0}
+        >
+          {params.value.map((item, index) => {
+            return (
+              <option id="projects-list" key={index} value={index}>
+                {item.name}
+              </option>
+            );
+          })}
+        </NativeSelect>
+      ),
+    },
     {
       field: "edit",
       headerName: "Edit",
       renderCell: (params) => (
         <Button
           style={{ backgroundColor: "#36C14B" }}
-          variant="contained"
+          variant="outlined"
+          color="light"
           size="small"
-          alt="Remy Sharp"
+          alt="edit"
           onClick={() => {
-            setUserData(Users[params.value.index]);
+            setClientData(Client[params.value.index]);
             setEditing(true);
           }}
         >
@@ -141,11 +154,11 @@ function ManageUser({ update }) {
       sortable: false,
       renderCell: (params) => (
         <Button
-          onClick={() => DeleteUser(params.value.id, params.value.image)}
+          onClick={() => DeleteClient(params.value.id)}
           style={{ backgroundColor: "#F76363" }}
           variant="contained"
           size="small"
-          alt="Remy Sharp"
+          alt="delete"
         >
           Delete
         </Button>
@@ -156,20 +169,19 @@ function ManageUser({ update }) {
   if (Editing) {
     return (
       <div>
-        <EditUser UserData={UserData} HandleEdit={HandleEdit} update={update} />
+        <EditClient ClientData={ClientData} HandleEdit={HandleEdit} />
       </div>
     );
   } else {
     return (
       <div>
-        <Typography className={usersTable.title} component="h1" variant="h5">
-          Users Manager
+        <Typography className={ClientTable.title} component="h1" variant="h5">
+          Clients Manager
         </Typography>
-        <div className={usersTable.usersTable}>
+        <div className={ClientTable.ClientTable}>
           <XGrid
-            pagination
             loading={Loading}
-            rows={Users}
+            rows={Client}
             columns={columns}
             pageSize={6}
             rowHeight={30}
@@ -180,4 +192,4 @@ function ManageUser({ update }) {
   }
 }
 
-export default ManageUser;
+export default ManageClient;

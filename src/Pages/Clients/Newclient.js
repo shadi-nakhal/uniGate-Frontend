@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
+import { useFormik } from "formik";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { useFormik } from "formik";
 import * as yup from "yup";
-import CookieService from "../../Service/CookieService";
+// import CookieService from "../../Service/CookieService";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 
 const style = {
@@ -22,6 +23,7 @@ const style = {
 
   title: {
     marginBottom: "1%",
+    marginTop: "2%",
   },
   submitcontainer: {
     display: "flex",
@@ -38,79 +40,75 @@ const style = {
   },
 };
 
-function Edituser({ UserData, HandleEdit, update }) {
-  const cookie = CookieService.get("Bearer");
+function Newclient() {
+  // const cookie = CookieService.get("Bearer");
   const [display, setDisplay] = useState({
     display: "none",
     margin: "10px",
     color: "Red",
   });
   const [message, setMessage] = useState("");
-  const [imgError, setImgError] = useState();
-  const [imageValue, setImageValue] = useState();
-  const [phoneValue, setphoneValue] = useState(UserData.mobile);
-  const [roles, setRoles] = useState([]);
+  const [phoneValue, setphoneValue] = useState();
+  const history = useHistory();
+
   const validationSchema = yup.object({
     firstname: yup
       .string()
-      .max(10, "Must be 10 characters or less")
+      .max(20, "Must be 20 characters or less")
       .required("Firstname is required"),
     lastname: yup
       .string()
-      .max(10, "Must be 10 characters or less")
+      .max(20, "Must be 20 characters or less")
       .required("Lastname is required"),
+    address: yup
+      .string()
+      .max(100, "Must be 30 characters or less")
+      .required("Address is required"),
     email: yup
       .string("Enter your email")
       .email("Enter a valid email")
       .required("Email is required"),
-    password: yup
-      .string("Enter your password")
-      .min(6, "Password should be of minimum 6 characters length"),
   });
-  const HandleSubmit = ({ email, firstname, lastname, role, ext }) => {
+  const HandleSubmit = ({ email, firstname, lastname, address }) => {
     const formData = new FormData();
-    formData.append("firstname", firstname);
-    formData.append("lastname", lastname);
-    if (email !== UserData.email) {
-      formData.append("email", email);
-    }
+    formData.append("name", firstname + " " + lastname);
+    formData.append("email", email);
+    formData.append("address", address);
     formData.append(
-      "mobile",
+      "phone",
       phoneValue[0] === "+" ? phoneValue : "+" + phoneValue
     );
-    if (imageValue) {
-      formData.append("image", imageValue);
-    }
-    formData.append("role", role);
-    formData.append("ext", ext);
 
     axios
-      .post(`/users/${UserData.id}/?_method=put`, formData)
+      .post("/client", formData)
       .then((res) => {
-        setMessage("User has been modified !");
+        console.log(res);
+        setMessage("Client has been added !");
         setDisplay({ display: "inline", margin: "10px", color: "green" });
-        HandleEdit();
-        update();
+        history.push("/ManageClients");
       })
       .catch((error) => {
-        console.log(error);
-        if (error) {
-          setMessage(error.response.data.message);
+        if (error.response.data.errors) {
+          setMessage(
+            Object.entries(error.response.data.errors).map(
+              (item) => " " + item[1] + ","
+            )
+          );
           setDisplay({ display: "inline", margin: "10px", color: "Red" });
         } else {
-          console.log(error);
           setMessage("N e t w o r k  E r r o r");
           setDisplay({ display: "inline", margin: "10px", color: "Red" });
         }
       });
   };
+
   const formik = useFormik({
     initialValues: {
-      firstname: UserData.firstname,
-      lastname: UserData.lastname,
-      email: UserData.email,
-      role: UserData.role,
-      ext: UserData.ext,
+      firstname: "",
+      lastname: "",
+      address: "",
+      email: "",
+      phone: "",
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
@@ -118,37 +116,16 @@ function Edituser({ UserData, HandleEdit, update }) {
     },
   });
 
-  useEffect(() => {
-    const fetchroles = async () => {
-      var config = {
-        method: "get",
-        url: "/roles",
-        headers: {
-          Authorization: `Bearer ${cookie}`,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      };
-      await axios(config)
-        .then((res) => {
-          setRoles(res.data);
-        })
-        .catch((err) => {
-          console.log(err.request);
-        });
-    };
-    fetchroles();
-  }, [cookie]);
-
   return (
     <div style={style.paperr}>
       <Typography style={style.title} component="h1" variant="h5">
-        Edit User
+        New Client
       </Typography>
       {<span style={display}>{message}</span>}
       <form onSubmit={formik.handleSubmit}>
         <div style={style.name}>
           <TextField
-            style={{ marginRight: "15px", marginBottom: "10px" }}
+            style={{ marginRight: "15px", marginBottom: "20px" }}
             name="firstname"
             variant="outlined"
             required
@@ -175,7 +152,6 @@ function Edituser({ UserData, HandleEdit, update }) {
             helperText={formik.touched.lastname && formik.errors.lastname}
             autoComplete="lastname"
             margin="dense"
-            autoFocus
           />
         </div>
         <div>
@@ -183,7 +159,7 @@ function Edituser({ UserData, HandleEdit, update }) {
             inputStyle={{
               backgroundColor: "#C3E0DC",
               borderColor: "#9CB3B0",
-              width: "39%",
+              width: "47%",
             }}
             inputProps={{
               id: "phone",
@@ -193,10 +169,8 @@ function Edituser({ UserData, HandleEdit, update }) {
               autoFocus: true,
             }}
             masks={{ lb: ". ... ..." }}
-            enableAreaCodes={true}
             country={"lb"}
             variant="outlined"
-            value={UserData.mobile}
             defaultCountry="lb"
             onChange={(phone) => setphoneValue(phone)}
             error={formik.touched.phone && Boolean(formik.errors.phone)}
@@ -206,23 +180,22 @@ function Edituser({ UserData, HandleEdit, update }) {
             autoFocus
           />
         </div>
-        <div>
-          <TextField
-            style={{ marginBottom: "10px", width: "100px" }}
-            variant="outlined"
-            required
-            id="ext"
-            label="Ext"
-            name="ext"
-            value={formik.values.ext}
-            onChange={formik.handleChange}
-            error={formik.touched.ext && Boolean(formik.errors.ext)}
-            helperText={formik.touched.ext && formik.errors.ext}
-            autoComplete="ext"
-            margin="dense"
-            autoFocus
-          />
-        </div>
+
+        <TextField
+          style={{ marginBottom: "10px", marginTop: "20px" }}
+          variant="outlined"
+          fullWidth
+          required
+          id="address"
+          label="Address"
+          name="address"
+          value={formik.values.address}
+          onChange={formik.handleChange}
+          error={formik.touched.address && Boolean(formik.errors.address)}
+          helperText={formik.touched.address && formik.errors.address}
+          autoComplete="address"
+          margin="dense"
+        />
 
         <TextField
           style={{ marginBottom: "10px" }}
@@ -240,59 +213,16 @@ function Edituser({ UserData, HandleEdit, update }) {
           margin="dense"
           autoFocus
         />
-        <TextField
-          style={{ marginBottom: "10px" }}
-          id="role"
-          select
-          value={formik.values.role}
-          onChange={formik.handleChange}
-          name="role"
-          SelectProps={{
-            native: true,
-          }}
-          helperText="Please select Role"
-          margin="dense"
-        >
-          {roles.map((option) => {
-            return (
-              <option key={option.id} value={option.name}>
-                {option.name}
-              </option>
-            );
-          })}
-        </TextField>
-        <div>
-          {imgError ? (
-            <p style={{ color: "red" }}>Image max size is 2Mb</p>
-          ) : null}
-          <label for="image">Profile Picture</label>
-          <TextField
-            variant="outlined"
-            fullWidth
-            name="image"
-            type="file"
-            id="image"
-            onChange={(event) => {
-              if (event.target.files[0].size > 2048000) {
-                setImgError(true);
-              } else {
-                setImgError(false);
-                const file = event.target.files[0];
-                setImageValue(file);
-              }
-            }}
-          />
-        </div>
+
         <div style={style.submitcontainer}>
           <Button
-            disableFocusRipple
             type="submit"
             size="large"
             variant="contained"
             color="primary"
             style={style.submit}
           >
-            Submit
+            Sign Up
           </Button>
         </div>
       </form>
@@ -300,4 +230,4 @@ function Edituser({ UserData, HandleEdit, update }) {
   );
 }
 
-export default Edituser;
+export default Newclient;

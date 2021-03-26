@@ -98,6 +98,7 @@ function Register() {
       .then((res) => {
         setMessage("User has been added !");
         setDisplay({ display: "inline", margin: "10px", color: "green" });
+        history.push("/ManageUsers");
       })
       .catch((error) => {
         if (error.response.data.errors) {
@@ -118,7 +119,7 @@ function Register() {
     const fetchroles = async () => {
       var config = {
         method: "get",
-        url: "http://localhost:8000/api/roles",
+        url: "/roles",
         headers: {
           Authorization: `Bearer ${cookie}`,
           "Content-Type": "application/x-www-form-urlencoded",

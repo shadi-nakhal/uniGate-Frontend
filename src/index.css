@@ -185,36 +185,98 @@ code {
   font-size: larger;
   align-self: center;
   cursor: default;
+  margin-left: 60px;
 }
 
 .logoutMenu > .MuiPaper-root {
   margin-top: 35px;
-  margin-right:30px;
-  background-color: #C3E0DC;
+  margin-right: 30px;
+  background-color: #c3e0dc;
 }
 
-.country-list{
-  background-color: #C3E0DC !important;
+.country-list {
+  background-color: #c3e0dc !important;
 }
 .selected-flag {
-  background-color: #C3E0DC !important;
+  background-color: #c3e0dc !important;
 }
 
 .MuiDataGrid-root {
-  border-color: #213d3a !important;
+  border-color: #305c54 !important;
 }
 .MuiDataGrid-iconSeparator {
-  color: #305C54 !important;
+  color: #305c54 !important;
 }
 
 .MuiDataGrid-row {
-  border-color:#305C54 !important;
+  border-color: #305c54 !important;
 }
 
-.MuiDataGrid-columnsContainer{
-  border-color: #305C54 !important;
+.MuiDataGrid-columnsContainer {
+  border-color: #305c54 !important;
 }
 
-.MuiDataGrid-row .Mui-even{
-  border-color: #305C54 !important;
+.MuiDataGrid-row .Mui-even {
+  border-color: #305c54 !important;
+}
+
+ul[aria-labelledby="demo-simple-select-label"] {
+  background-color: #c3e0dc;
+}
+
+#demo-simple-select {
+  padding-top: 0%;
+  padding-bottom: 0%;
+}
+
+.MuiDataGrid-main > div:nth-child(1) {
+  display: none;
+}
+
+div.MuiPaper-root:nth-child(3) {
+  margin-top: 30px;
+}
+
+.react-grid-Main {
+  background-color: #c3e0dc !important;
+  border: none !important;
+  outline: none !important;
+}
+
+.react-grid-Header {
+  background-color: #c3e0dc !important;
+}
+.react-grid-HeaderCell {
+  background-color: #c3e0dc !important;
+  border: 1px solid #213d3a !important;
+}
+
+.react-grid-Cell {
+  background-color: #c3e0dc !important;
+  /* border: 1px solid #213d3a !important; */
+  border: none !important;
+  border-bottom: #dbfbf6 solid 1px !important;
+}
+
+.react-grid-Canvas {
+  background-color: #c3e0dc !important;
+}
+
+.react-grid-Grid {
+  background-color: #c3e0dc !important;
+  border: none !important;
+}
+
+* {
+  box-sizing: border-box;
+  scrollbar-color: #c3e0dc #c3e0dc;
+  scrollbar-width: thin;
+}
+
+.react-grid-HeaderCell__draggable {
+  width: 20px !important;
+}
+
+.rdg-selected {
+  border: none !important;
 }

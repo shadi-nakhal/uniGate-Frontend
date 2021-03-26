@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { IconContext } from "react-icons";
 import * as FaIcons from "react-icons/fa";
 import Cookie from "../../Service/CookieService";
@@ -10,28 +10,28 @@ require("dotenv").config();
 
 function Navbar({ checksidebar, forwardedRef, isVisible, update }) {
   const { setUser, user } = useContext(UserContext);
-  async function load() {
-    const cookie = Cookie.get("Bearer");
-    var config = {
-      method: "get",
-      url: "/profile",
-      headers: {
-        Authorization: `Bearer ${cookie}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    };
-    await axios(config)
-      .then((res) => {
-        setUser(res.data);
-      })
-      .catch((err) => {
-        console.log(err, "navbar profile");
-      });
-  }
 
   useEffect(() => {
+    async function load() {
+      const cookie = Cookie.get("Bearer");
+      var config = {
+        method: "get",
+        url: "/profile",
+        headers: {
+          Authorization: `Bearer ${cookie}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      };
+      await axios(config)
+        .then((res) => {
+          setUser(res.data);
+        })
+        .catch((err) => {
+          console.log(err, "navbar profile");
+        });
+    }
     load();
-  }, [update]);
+  }, [update, setUser]);
 
   return (
     <IconContext.Provider value={{ color: isVisible ? "#ADBCBA" : "#59ecdb" }}>
