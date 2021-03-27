@@ -6,7 +6,7 @@ import { useFormik } from "formik";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import * as yup from "yup";
-// import CookieService from "../../Service/CookieService";
+import CookieService from "../../Service/CookieService";
 import axios from "axios";
 
 const style = {
@@ -40,7 +40,7 @@ const style = {
 };
 
 function Editclient({ ClientData, HandleEdit }) {
-  // const cookie = CookieService.get("Bearer");
+  const cookie = CookieService.get("Bearer");
   const [display, setDisplay] = useState({
     display: "none",
     margin: "10px",
@@ -78,9 +78,17 @@ function Editclient({ ClientData, HandleEdit }) {
       "phone",
       phoneValue[0] === "+" ? phoneValue : "+" + phoneValue
     );
+    var config = {
+      method: "post",
+      url: `/client/${ClientData.id}/?_method=put`,
+      headers: {
+        Authorization: `Bearer ${cookie}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: formData,
+    };
 
-    axios
-      .post(`/client/${ClientData.id}/?_method=put`, formData)
+    axios(config)
       .then((res) => {
         console.log(res);
         setMessage("Client info has been updated !");

@@ -130,6 +130,40 @@ function AddTest({ HandleData }) {
       : null,
   });
 
+  const HandleTask = async (id) => {
+    const formData = new FormData();
+    console.log(id);
+    formData.append("status", 1);
+    var config = {
+      method: "post",
+      url: `/task/${id}?_method=PUT`,
+      headers: {
+        Authorization: `Bearer ${cookie}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: formData,
+    };
+    await axios(config)
+      .then((res) => {
+        console.log(res);
+        // history.push("/ManageProjects");
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response.data.errors) {
+          setMessage(
+            Object.entries(error.response.data.errors).map(
+              (item) => " " + item[1] + ","
+            )
+          );
+          setDisplay({ display: "inline", margin: "10px", color: "Red" });
+        } else {
+          setMessage("N e t w o r k  E r r o r");
+          setDisplay({ display: "inline", margin: "10px", color: "Red" });
+        }
+      });
+  };
+
   const HandleSubmit = useCallback(
     ({
       weight,
@@ -156,12 +190,21 @@ function AddTest({ HandleData }) {
       formData.append("clay_reading", clay_reading);
       formData.append("clay_reading2", clay_reading2);
       formData.append("technician_id", user.user.id);
-      axios
-        .post(CheckType.type ? "/compressive" : "/sand", formData)
+      var config = {
+        method: "post",
+        url: CheckType.type ? "/compressive" : "/sand",
+        headers: {
+          Authorization: `Bearer ${cookie}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        data: formData,
+      };
+      axios(config)
         .then((res) => {
           console.log(res);
           setMessage("Test has been added !");
           setDisplay({ display: "inline", margin: "10px", color: "green" });
+          HandleTask(SampData.id);
           // history.push("/ManageSamples");
         })
         .catch((error) => {

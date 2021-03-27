@@ -150,8 +150,17 @@ function EditProject({ ProjectData, HandleEdit }) {
       contact_phone[0] === "+" ? contact_phone : "+" + contact_phone
     );
     formData.append("client_id", client_id);
-    axios
-      .post(`/project/${ProjectData.id}/?_method=put`, formData)
+    var config = {
+      method: "post",
+      url: `/project/${ProjectData.id}/?_method=put`,
+      headers: {
+        Authorization: `Bearer ${cookie}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: formData,
+    };
+
+    axios(config)
       .then((res) => {
         console.log(res);
         setMessage("Project has been Modified !");

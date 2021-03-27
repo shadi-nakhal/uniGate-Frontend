@@ -41,10 +41,10 @@ function ManageSample({ update }) {
   const [SampleData, setSampleData] = useState({});
   const [SampType, setSampType] = useState({
     value: "materials",
-    label: "materials",
+    label: "Materials",
   });
   const [Types, setTypes] = useState([]);
-  const [total, settotal] = useState(0);
+  const [meta, setmeta] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
   const url = `?page=${pageNumber}`;
   const useStyles = makeStyles((theme) => ({
@@ -115,16 +115,13 @@ function ManageSample({ update }) {
     };
     await axios(config)
       .then((res) => {
-        settotal(res.data.total);
+        setmeta(res.data.meta);
         setSamples(
           res.data.data.map((item, index) => {
             return {
               ...item,
               delete: { id: item.id },
-              edit: { id: item.id, index: index },
-              added_by:
-                item.technician.firstname + " " + item.technician.lastname,
-              client_id: item.client.name,
+              assign: { id: item.id, index: index },
             };
           })
         );
@@ -146,15 +143,14 @@ function ManageSample({ update }) {
     };
     await axios(config)
       .then((res) => {
+        setmeta(res.data.meta);
         setSamples(
           res.data.data.map((item, index) => {
             return {
               ...item,
               delete: { id: item.id },
               assign: { id: item.id, index: index },
-              added_by:
-                item.technician.firstname + " " + item.technician.lastname,
-              client_id: item.client.name,
+              status: { id: item.id, index: index, tasks: item.status },
             };
           })
         );
@@ -167,7 +163,6 @@ function ManageSample({ update }) {
   useEffect(() => {
     loadSamples();
   }, [SampType, pageNumber, Editing]);
-  console.log(SampType);
 
   const columns = useMemo(() => [
     {
@@ -232,19 +227,38 @@ function ManageSample({ update }) {
       headerName: "Status",
       width: 120,
       sortable: false,
-      renderCell: (params) => (
-        <Chip
-          label="UnAssigned"
-          size="small"
-          style={{ backgroundColor: "#E2F43F", color: "#3C5B55" }}
-        />
-      ),
+      renderCell: (params) => {
+        let state = params.row.status;
+        const colors = () => {
+          switch (state) {
+            case "Warning":
+              return "#E2F43F";
+            case "Completed":
+              return "green";
+            case "Pending":
+              return "blue";
+            case "Over due":
+              return "red";
+          }
+        };
+        return (
+          <Chip
+            label={params.row.status}
+            size="small"
+            style={{
+              backgroundColor: colors(),
+              color: "black",
+              width: "100px",
+            }}
+          />
+        );
+      },
       // style={{ backgroundColor: "#50DD21", color: "#3C5B55" }}
     },
     {
       field: "tests-assigned",
       headerName: "Tests-Assigned",
-      width: 180,
+      width: 220,
       sortable: false,
       renderCell: (params) => (
         <NativeSelect
@@ -252,15 +266,15 @@ function ManageSample({ update }) {
           id="demo-simple-select"
           className={SamplesTable.selectEmpty}
           value={0}
+          style={{ width: "100%" }}
         >
-          <option>Compression blabla Test - Shadi nakhal - pending</option>
-          {/* {params.value.map((item, index) => {
+          {params.row.tasks.map((item, index) => {
             return (
               <option id="projects-list" key={index} value={index}>
-                {item.name}
+                {item.test_name}
               </option>
             );
-          })} */}
+          })}
         </NativeSelect>
       ),
     },
@@ -270,8 +284,8 @@ function ManageSample({ update }) {
     { field: "date", headerName: "Recieved Date", width: 200 },
     { field: "client_ref", headerName: "Client's Ref", width: 200 },
     { field: "source", headerName: "Supplier", width: 200 },
-    { field: "truck_number", headerName: "Truck's number", width: 200 },
-    { field: "ticket_number", headerName: "Ticket's number", width: 200 },
+    { field: "truck_number", headerName: "Truck number", width: 200 },
+    { field: "ticket_number", headerName: "Ticket number", width: 200 },
     { field: "client_id", headerName: "Client", width: 200 },
     {
       field: "added_by",
@@ -310,20 +324,6 @@ function ManageSample({ update }) {
         <Typography className={SamplesTable.title} component="h1" variant="h5">
           Samples Manager
         </Typography>
-        {/* <NativeSelect
-          value={SampType}
-          style={{ width: "200px", marginLeft: "20px", marginBottom: "20px" }}
-          labelId="manage-sample-select"
-          onChange={(e) => HandleTypes(e)}
-        >
-          {Types.map((item, index) => {
-            return (
-              <option id="projects-list" key={index} value={item}>
-                {item}
-              </option>
-            );
-          })}
-        </NativeSelect> */}
         <Select
           id="manage-sample-select"
           value={SampType}
@@ -336,14 +336,13 @@ function ManageSample({ update }) {
             pagination
             paginationMode="server"
             onPageChange={(params) => {
-              console.log(params.page);
               setPageNumber(params.page + 1);
             }}
             rows={Samples}
             columns={columns}
-            rowCount={total}
+            rowCount={meta.total}
             pageSize={10}
-            rowHeight={25}
+            rowHeight={30}
           />
         </div>
       </div>

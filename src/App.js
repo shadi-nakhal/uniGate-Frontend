@@ -17,8 +17,8 @@ import NewProject from "./Pages/Projects/Newproject";
 import ManageProject from "./Pages/Projects/Manageproject";
 import NewSample from "./Pages/Sample/NewSample/Newsample"; //newsample
 import ManageSample from "./Pages/Sample/ManageSamples/ManageSample";
-import Tasks from "./Pages/Tasks/ManageTasks/Tasks";
-import AddTest from "./Pages/Tests/AddTest/AddTest";
+import Tasks from "./Pages/Tasks/ManageTasks/ManageTasks";
+import TestRecords from "./Pages/Tests/TestRecords/TestRecords";
 
 require("dotenv").config();
 
@@ -102,8 +102,8 @@ function App() {
                 <Route exact path="/ManageTasks">
                   <Tasks />
                 </Route>
-                <Route exact path="/AddTest">
-                  <AddTest />
+                <Route exact path="/">
+                  <TestRecords />
                 </Route>
               </Protection>
             </Switch>

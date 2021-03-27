@@ -15,12 +15,26 @@ const comp2 = React.memo(({ SampleData, HandleEdit }) => {
   const { setUser, user } = useContext(UserContext);
   const [SelectData, setSelectData] = useState({ tests: [], users: [] });
   const [update, setUpdate] = useState(true);
+  const [message, setMessage] = useState("");
   const [display, setDisplay] = useState({
     display: "none",
     margin: "10px",
     color: "Red",
   });
-  const [message, setMessage] = useState("");
+
+  const HandleDisplay = useCallback(
+    (e) => {
+      setDisplay(e);
+    },
+    [display]
+  );
+
+  const HandleMessage = useCallback(
+    (e) => {
+      setMessage(e);
+    },
+    [message]
+  );
 
   useEffect(() => {
     const fetchSelectData = async () => {
@@ -54,14 +68,24 @@ const comp2 = React.memo(({ SampleData, HandleEdit }) => {
     formData.append("sample_type", SampleData.type);
     formData.append("sample_ref", SampleData.ref);
     formData.append("status", 0);
-    axios
-      .post("/task", formData)
+    let config = {
+      method: "post",
+      url: "/task",
+      headers: {
+        Authorization: `Bearer ${cookie}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: formData,
+    };
+    axios(config)
       .then((res) => {
+        console.log(res);
         HandleUpdate();
         setMessage("Task has been created !");
         setDisplay({ display: "inline", margin: "10px", color: "green" });
         // history.push("/ManageProjects");
       })
+
       .catch((error) => {
         console.log(error);
         if (error.response.data.errors) {
@@ -97,13 +121,16 @@ const comp2 = React.memo(({ SampleData, HandleEdit }) => {
 
   return (
     <div>
-      <Typography
-        component="h1"
-        variant="h5"
-        style={{ textAlign: "center", margin: "20px" }}
-      >
-        Assign Tests
-      </Typography>
+      <div style={style.paperr}>
+        <Typography
+          component="h1"
+          variant="h5"
+          style={{ textAlign: "center", margin: "20px" }}
+        >
+          Assign Tests
+        </Typography>
+        {<span style={display}>{message}</span>}
+      </div>
       <form
         onSubmit={formik.handleSubmit}
         style={{
@@ -200,7 +227,12 @@ const comp2 = React.memo(({ SampleData, HandleEdit }) => {
         </div>
       </form>
       <div>
-        <Grid update={update} SampleData={SampleData} />
+        <Grid
+          update={update}
+          SampleData={SampleData}
+          HandleDisplay={HandleDisplay}
+          HandleMessage={HandleMessage}
+        />
       </div>
     </div>
   );

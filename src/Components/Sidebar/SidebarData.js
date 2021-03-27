@@ -5,6 +5,23 @@ const items = [
     path: "/",
   },
   {
+    name: "Tasks",
+    label: "Tasks",
+    path: "/ManageTasks",
+  },
+  {
+    name: "Samples",
+    label: "Samples",
+    items: [
+      { name: "New Sample", label: "New Sample", path: "/NewSample" },
+      {
+        name: "Manage Samples",
+        label: "Manage Samples",
+        path: "/ManageSamples",
+      },
+    ],
+  },
+  {
     name: "Clients",
     label: "Clients",
     items: [
@@ -28,50 +45,7 @@ const items = [
       },
     ],
   },
-  {
-    name: "Samples",
-    label: "Samples",
-    items: [
-      { name: "New Sample", label: "New Sample", path: "/NewSample" },
-      {
-        name: "Manage Samples",
-        label: "Manage Samples",
-        path: "/ManageSamples",
-      },
-    ],
-  },
-  {
-    name: "Tests",
-    label: "Tests",
-    items: [
-      {
-        name: "Add Test",
-        label: "Add Test",
-        path: "/AddTest",
-      },
-      {
-        name: "Tests Records",
-        label: "Tests Records",
-        path: "/TestsRecords",
-      },
-    ],
-  },
-  {
-    name: "Tasks",
-    label: "Tasks",
-    items: [
-      {
-        name: "Assign Tasks",
-        label: "Assign Tasks",
-        path: "/AssignTasks",
-      },
-      {
-        name: "Manage Tasks",
-        label: "Manage Tasks",
-        path: "/ManageTasks",
-      },
-    ],
-  },
+
   {
     name: "Users",
     label: "Users",

@@ -260,6 +260,7 @@ div.MuiPaper-root:nth-child(3) {
 
 .react-grid-Canvas {
   background-color: #c3e0dc !important;
+  overflow-y: hidden !important;
 }
 
 .react-grid-Grid {
@@ -269,7 +270,7 @@ div.MuiPaper-root:nth-child(3) {
 
 * {
   box-sizing: border-box;
-  scrollbar-color: #c3e0dc #c3e0dc;
+  scrollbar-color: #213d3a #5ba39b;
   scrollbar-width: thin;
 }
 
@@ -279,4 +280,8 @@ div.MuiPaper-root:nth-child(3) {
 
 .rdg-selected {
   border: none !important;
+}
+
+.react-grid-Row:hover {
+  color: #006d5d !important;
 }

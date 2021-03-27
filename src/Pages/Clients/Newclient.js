@@ -6,7 +6,7 @@ import { useFormik } from "formik";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import * as yup from "yup";
-// import CookieService from "../../Service/CookieService";
+import CookieService from "../../Service/CookieService";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 
@@ -41,7 +41,7 @@ const style = {
 };
 
 function Newclient() {
-  // const cookie = CookieService.get("Bearer");
+  const cookie = CookieService.get("Bearer");
   const [display, setDisplay] = useState({
     display: "none",
     margin: "10px",
@@ -78,9 +78,16 @@ function Newclient() {
       "phone",
       phoneValue[0] === "+" ? phoneValue : "+" + phoneValue
     );
-
-    axios
-      .post("/client", formData)
+    let config = {
+      method: "post",
+      url: "/client",
+      headers: {
+        Authorization: `Bearer ${cookie}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: formData,
+    };
+    axios(config)
       .then((res) => {
         console.log(res);
         setMessage("Client has been added !");

@@ -5,6 +5,7 @@ import CookieService from "../../../Service/CookieService";
 import Chip from "@material-ui/core/Chip";
 import axios from "axios";
 import { Typography } from "@material-ui/core";
+import TablePagination from "@material-ui/core/TablePagination";
 import AddTest from "./AddTest/AddTest";
 
 const Tasks = React.memo(() => {
@@ -13,18 +14,35 @@ const Tasks = React.memo(() => {
   const [rows, setRows] = useState([]);
   const [HandleData, setHandleData] = useState({});
   const [Handling, setHandling] = useState(false);
+  const [page, setPage] = useState(0);
+  const [meta, setMeta] = useState({});
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const defaultColumnProperties = {
     resizable: true,
   };
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
   const ProgressBarFormatter = ({ value }) => {
     return (
       <Chip
-        label={value ? "Completed" : "Pending"}
+        label={value}
         size="small"
         style={{
-          backgroundColor: value ? "green" : "#E2F43F",
+          backgroundColor:
+            value == "Completed"
+              ? "green"
+              : value == "Over due"
+              ? "red"
+              : "#E2F43F",
           color: "black",
           width: "150px",
         }}
@@ -35,8 +53,6 @@ const Tasks = React.memo(() => {
   const HandleTask = useCallback((value) => {
     setHandleData(value);
     setHandling(!Handling);
-
-    console.log(value);
   }, []);
 
   const HandleTaskButton = (val) => {
@@ -78,7 +94,7 @@ const Tasks = React.memo(() => {
   const fetchSelectData = async () => {
     var config = {
       method: "get",
-      url: `/tasks`,
+      url: `/tasks?page=${page + 1}`,
       headers: {
         Authorization: `Bearer ${cookie}`,
         "Content-Type": "application/x-www-form-urlencoded",
@@ -86,16 +102,18 @@ const Tasks = React.memo(() => {
     };
     await axios(config)
       .then((res) => {
-        setRows(res.data);
+        setRows(res.data.data);
+        setMeta(res.data.meta);
+        console.log(res.data.meta);
       })
       .catch((err) => {
         console.log(err);
       });
   };
-
+  console.log(page);
   useEffect(() => {
     fetchSelectData();
-  }, []);
+  }, [page]);
 
   if (Handling) {
     return (
@@ -124,6 +142,7 @@ const Tasks = React.memo(() => {
         <ReactDataGrid
           columns={columns}
           getCellActions={getCellActions}
+          minHeight={400}
           rowGetter={(i) => {
             return rows[i];
           }}
@@ -131,6 +150,14 @@ const Tasks = React.memo(() => {
           onColumnResize={(idx, width) =>
             console.log(`Column ${idx} has been resized to ${width}`)
           }
+        />
+        <TablePagination
+          component="div"
+          count={meta.total}
+          page={page}
+          onChangePage={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </div>
     );

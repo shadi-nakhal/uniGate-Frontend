@@ -92,9 +92,16 @@ function Register() {
     formData.append("image", imageValue);
     formData.append("role", role);
     formData.append("ext", ext);
-
-    axios
-      .post("/register", formData)
+    var config = {
+      method: "post",
+      url: "/register",
+      headers: {
+        Authorization: `Bearer ${cookie}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: formData,
+    };
+    axios(config, formData)
       .then((res) => {
         setMessage("User has been added !");
         setDisplay({ display: "inline", margin: "10px", color: "green" });

@@ -98,8 +98,16 @@ function Edituser({ UserData, update }) {
     formData.append("role", role);
     formData.append("ext", ext);
 
-    axios
-      .post(`/users/${UserData.id}/?_method=put`, formData)
+    var config = {
+      method: "post",
+      url: `/users/${UserData.id}/?_method=put`,
+      headers: {
+        Authorization: `Bearer ${cookie}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: formData,
+    };
+    axios(config)
       .then((res) => {
         setMessage("User has been modified !");
         setDisplay({ display: "inline", margin: "10px", color: "green" });

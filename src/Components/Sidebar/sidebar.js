@@ -25,6 +25,11 @@ function SubItem({
       <ListItem
         button
         dense
+        onClick={() => {
+          if (!Array.isArray(items)) {
+            rest.checksidebar();
+          }
+        }}
         {...rest}
         style={{
           margin: 0,

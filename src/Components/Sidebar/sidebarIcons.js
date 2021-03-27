@@ -115,7 +115,7 @@ export function ArrowsIcons(items, open) {
         return (
           <div
             style={{
-              marginRight: "20%",
+              marginRight: "25%",
               fontSize: "25px",
               color: "#E0F5F2",
             }}
@@ -126,7 +126,7 @@ export function ArrowsIcons(items, open) {
     return (
       <div
         style={{
-          marginRight: "20%",
+          marginRight: "25%",
           fontSize: "25px",
           color: "#E0F5F2",
         }}

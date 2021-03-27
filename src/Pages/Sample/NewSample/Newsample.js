@@ -136,14 +136,21 @@ function NewsampleO() {
       formData.append("type_description", type_description);
       formData.append("technician_id", user.user.id);
       formData.append("test_date", test_date);
-
-      axios
-        .post(CheckType.type ? "/concrete" : "/materials", formData)
+      var config = {
+        method: "post",
+        url: CheckType.type ? "/concrete" : "/materials",
+        headers: {
+          Authorization: `Bearer ${cookie}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        data: formData,
+      };
+      axios(config)
         .then((res) => {
           console.log(res);
           setMessage("Sample has been added !");
           setDisplay({ display: "inline", margin: "10px", color: "green" });
-          // history.push("/ManageSamples");
+          history.push("/ManageSamples");
         })
         .catch((error) => {
           console.log(error);

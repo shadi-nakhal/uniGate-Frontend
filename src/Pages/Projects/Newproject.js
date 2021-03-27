@@ -141,8 +141,16 @@ function Newproject() {
       contact_phone[0] === "+" ? contact_phone : "+" + contact_phone
     );
     formData.append("client_id", client_id);
-    axios
-      .post("/project", formData)
+    let config = {
+      method: "post",
+      url: "/project",
+      headers: {
+        Authorization: `Bearer ${cookie}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: formData,
+    };
+    axios(config)
       .then((res) => {
         console.log(res);
         setMessage("Project has been added !");
