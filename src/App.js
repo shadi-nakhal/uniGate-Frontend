@@ -59,8 +59,6 @@ function App() {
         <div
           style={{
             paddingTop: "58px",
-            // paddingLeft: "7%",
-            // paddingRight: "7%",
           }}
         >
           <Router>
