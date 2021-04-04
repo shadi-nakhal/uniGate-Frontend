@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect, useCallback } from "react";
 import ReactDataGrid from "react-data-grid";
 import Button from "@material-ui/core/Button";
 import CookieService from "../../../Service/CookieService";
+import UserContext from "../../../Service/UserContext";
 import Chip from "@material-ui/core/Chip";
 import axios from "axios";
 import { Typography } from "@material-ui/core";
@@ -10,6 +11,7 @@ import AddTest from "./AddTest/AddTest";
 
 const Tasks = React.memo(() => {
   const cookie = CookieService.get("Bearer");
+  const { setUser, user } = useContext(UserContext);
   const [Tasks, setTasks] = useState();
   const [rows, setRows] = useState([]);
   const [HandleData, setHandleData] = useState({});
@@ -42,6 +44,8 @@ const Tasks = React.memo(() => {
               ? "green"
               : value == "Over due"
               ? "red"
+              : value == "Pending"
+              ? "blue"
               : "#E2F43F",
           color: "black",
           width: "150px",
@@ -52,14 +56,23 @@ const Tasks = React.memo(() => {
 
   const HandleTask = useCallback((value) => {
     setHandleData(value);
-    setHandling(!Handling);
+    setHandling(true);
+  }, []);
+
+  const HandleToggle = useCallback((value) => {
+    setHandling(false);
   }, []);
 
   const HandleTaskButton = (val) => {
+    let disabled = true;
+    if (val.status == "Pending" || val.status == "Warning") {
+      disabled = false;
+    }
     return [
       {
         icon: (
           <Button
+            disabled={disabled}
             style={{ backgroundColor: "#36C14B" }}
             onClick={() => HandleTask(val)}
             variant="contained"
@@ -87,9 +100,15 @@ const Tasks = React.memo(() => {
     { key: "sample_type", name: "Sample Type" },
     { key: "sample_ref", name: "Sample Reference" },
     { key: "status", name: " status", formatter: ProgressBarFormatter },
-    { key: "created_at", name: "created_at", width: 170 },
-    { key: "handle", name: "Handle", width: 80 },
+    { key: "test_date", name: "Test date", width: 170 },
+    { key: "created_at", name: "Assigned at", width: 170 },
   ].map((c) => ({ ...c, ...defaultColumnProperties }));
+
+  if (user.user.role == "Head of lab" || user.user.role == "Technician") {
+    let con = [{ key: "handle", name: "Handle", width: 80 }];
+    let index = columns.length;
+    columns.splice(index, 0, ...con);
+  }
 
   const fetchSelectData = async () => {
     var config = {
@@ -104,13 +123,12 @@ const Tasks = React.memo(() => {
       .then((res) => {
         setRows(res.data.data);
         setMeta(res.data.meta);
-        console.log(res.data.meta);
       })
       .catch((err) => {
         console.log(err);
       });
   };
-  console.log(page);
+
   useEffect(() => {
     fetchSelectData();
   }, [page]);
@@ -118,7 +136,11 @@ const Tasks = React.memo(() => {
   if (Handling) {
     return (
       <div>
-        <AddTest HandleData={HandleData} Handling={Handling} />
+        <AddTest
+          HandleData={HandleData}
+          Handling={Handling}
+          HandleToggle={HandleToggle}
+        />
       </div>
     );
   } else {
@@ -135,7 +157,7 @@ const Tasks = React.memo(() => {
         <Typography
           component="h1"
           variant="h5"
-          style={{ textAlign: "center", margin: "20px" }}
+          style={{ textAlign: "center", margin: "20px", marginRight: "15px" }}
         >
           Tasks
         </Typography>
@@ -147,9 +169,6 @@ const Tasks = React.memo(() => {
             return rows[i];
           }}
           rowsCount={rows.length + 1}
-          onColumnResize={(idx, width) =>
-            console.log(`Column ${idx} has been resized to ${width}`)
-          }
         />
         <TablePagination
           component="div"

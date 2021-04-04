@@ -11,7 +11,7 @@ import CompressiveTest from "./CompressiveTest";
 import axios from "axios";
 import UserContext from "../../../../Service/UserContext";
 
-function AddTest({ HandleData }) {
+function AddTest({ HandleData, HandleToggle }) {
   const cookie = CookieService.get("Bearer");
   const { setUser, user } = useContext(UserContext);
   const history = useHistory();
@@ -146,7 +146,8 @@ function AddTest({ HandleData }) {
     await axios(config)
       .then((res) => {
         console.log(res);
-        // history.push("/ManageProjects");
+        history.push("/");
+        HandleToggle(false);
       })
       .catch((error) => {
         console.log(error);
@@ -205,11 +206,11 @@ function AddTest({ HandleData }) {
           setMessage("Test has been added !");
           setDisplay({ display: "inline", margin: "10px", color: "green" });
           HandleTask(SampData.id);
-          // history.push("/ManageSamples");
+          history.push("/ManageTasks");
         })
         .catch((error) => {
-          console.log(error);
-          if (error.response.data.errors) {
+          console.log(error.response);
+          if (error.response.data.errors !== undefined) {
             setMessage(
               Object.entries(error.response.data.errors).map(
                 (item) => " " + item[1] + ","
@@ -243,7 +244,7 @@ function AddTest({ HandleData }) {
       HandleSubmit(values);
     },
   });
-
+  console.log(SampData);
   const TestSwitch = () => {
     switch (HandleData.test_name) {
       case "Compressive Strength":
@@ -275,6 +276,15 @@ function AddTest({ HandleData }) {
             style={style.submit}
           >
             Submit
+          </Button>
+          <Button
+            size="large"
+            onClick={() => HandleToggle(false)}
+            variant="contained"
+            color="primary"
+            style={style.submit}
+          >
+            Back
           </Button>
         </div>
       </form>

@@ -41,7 +41,6 @@ function AddTest({ SampleData }) {
     setCheckType({ ...CheckType, ...value });
   }, []);
 
-  console.log(SampData.type_description);
   useEffect(() => {
     const fetchclients = async () => {
       var config = {
@@ -166,7 +165,6 @@ function AddTest({ SampleData }) {
           console.log(res);
           setMessage("Project has been added !");
           setDisplay({ display: "inline", margin: "10px", color: "green" });
-          // history.push("/ManageSamples");
         })
         .catch((error) => {
           console.log(error);
@@ -233,6 +231,15 @@ function AddTest({ SampleData }) {
             style={style.submit}
           >
             Submit
+          </Button>
+          <Button
+            size="large"
+            onClick={() => Handling(false)}
+            variant="contained"
+            color="primary"
+            style={style.addbutton}
+          >
+            Back
           </Button>
         </div>
       </form>

@@ -67,7 +67,9 @@ const comp2 = React.memo(({ SampleData, HandleEdit }) => {
     formData.append("sample_id", SampleData.id);
     formData.append("sample_type", SampleData.type);
     formData.append("sample_ref", SampleData.ref);
+    formData.append("test_date", SampleData.test_date);
     formData.append("status", 0);
+    console.log(SampleData.test_date);
     let config = {
       method: "post",
       url: "/task",
@@ -101,6 +103,7 @@ const comp2 = React.memo(({ SampleData, HandleEdit }) => {
         }
       });
   });
+  console.log(SampleData);
 
   const validationSchema = yup.object({
     technician_id: yup.string().required(" Technician name is required"),
@@ -109,8 +112,7 @@ const comp2 = React.memo(({ SampleData, HandleEdit }) => {
 
   const formik = useFormik({
     initialValues: {
-      technician_id: "",
-      technician_id: "",
+      technician_id: user.user.role == "Head of lab" ? "" : user.user.id,
       test_name: "",
     },
     validationSchema: validationSchema,
@@ -164,14 +166,20 @@ const comp2 = React.memo(({ SampleData, HandleEdit }) => {
               Boolean(formik.errors.technician_id)
             }
           >
-            <option value=""></option>
-            {SelectData.users.map((option) => {
-              return (
-                <option key={option.id} value={option.id}>
-                  {option.firstname + " " + option.lastname}
-                </option>
-              );
-            })}
+            <option value={user.user.role == "Head of lab" ? "" : user.user.id}>
+              {user.user.role == "Head of lab"
+                ? ""
+                : user.user.firstname + " " + user.user.lastname}
+            </option>
+            {user.user.role == "Head of lab"
+              ? SelectData.users.map((option) => {
+                  return (
+                    <option key={option.id} value={option.id}>
+                      {option.firstname + " " + option.lastname}
+                    </option>
+                  );
+                })
+              : null}
           </TextField>
           <TextField
             style={style.TextField}

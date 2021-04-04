@@ -4,11 +4,13 @@ const items = [
     label: "Logbook",
     path: "/",
   },
+
   {
     name: "Tasks",
     label: "Tasks",
     path: "/ManageTasks",
   },
+
   {
     name: "Samples",
     label: "Samples",
@@ -21,6 +23,7 @@ const items = [
       },
     ],
   },
+
   {
     name: "Clients",
     label: "Clients",

@@ -107,15 +107,48 @@ const TestRecords = React.memo(() => {
 
   const columns = [
     { key: "id", name: "ID", width: 65 },
-    { key: "technician_name", name: "Technician" },
-    { key: "sample_ref", name: "Sample Reference" },
-    { key: "sample_type", name: "Sample Type" },
-    { key: "sample_description", name: "Sample description" },
-    { key: "test_name", name: "Test" },
-    { key: "test_date", name: "Test Date" },
+    { key: "technician_name", name: "Added by", width: 170 },
+    { key: "tested_by", name: "Tested by", width: 170 },
+    { key: "sample_ref", name: "Sample Reference", width: 170 },
+    { key: "sample_type", name: "Sample Type", width: 170 },
+    { key: "sample_description", name: "Sample description", width: 200 },
+    { key: "source", name: "Supplier", width: 170 },
+    { key: "test_name", name: "Test", width: 190 },
+    { key: "test_date", name: "Test Date", width: 170 },
+
     // { key: "status", name: " status", formatter: ProgressBarFormatter },
     { key: "created_at", name: "created_at", width: 170 },
   ].map((c) => ({ ...c, ...defaultColumnProperties }));
+
+  if (SampType.label == "Concrete") {
+    let con = [
+      { key: "cast_date", name: "Cast Date", width: 150 },
+      { key: "age", name: "Age", width: 100 },
+      { key: "grade", name: "Grade", width: 100 },
+      { key: "mix_description", name: "Mix Description", width: 180 },
+      { key: "mpa", name: "MPA", width: 100 },
+      { key: "mpa_per", name: "MPA %", width: 100 },
+      { key: "fracture", name: "Fracture", width: 100 },
+    ];
+
+    columns.splice(6, 0, ...con);
+  }
+
+  if (SampType.label == "Materials") {
+    let con = [
+      { key: "time", name: "Time", width: 100 },
+      { key: "sand_reading", name: "Sand Reading", width: 120 },
+      { key: "sand_reading2", name: "Sand Reading 2", width: 135 },
+      { key: "clay_reading", name: "Clay Reading", width: 120 },
+      { key: "clay_reading2", name: "Clay Reading 2", width: 135 },
+      { key: "test_result", name: "Test result", width: 110 },
+      { key: "test_result2", name: "Test result 2", width: 110 },
+      { key: "average", name: "Average", width: 100 },
+    ];
+
+    columns.splice(6, 0, ...con);
+  }
+
   const LoadTests = async () => {
     let url = SampType.value;
     var config = {
@@ -130,12 +163,13 @@ const TestRecords = React.memo(() => {
       .then((res) => {
         setMeta(res.data.meta);
         setRows(res.data.data);
+        console.log(res.data.data);
       })
       .catch((err) => {
         console.log(err);
       });
   };
-  console.log(page);
+
   useEffect(() => {
     async function fetchSelectData() {
       var config = {
@@ -159,11 +193,12 @@ const TestRecords = React.memo(() => {
   useEffect(() => {
     LoadTests();
   }, [SampType]);
-  console.log(SampType.value);
+
   const options = Types.map((item, index) => ({
     value: item.test_route,
     label: item.belongs,
   }));
+
   return (
     <div>
       <Typography
@@ -173,6 +208,7 @@ const TestRecords = React.memo(() => {
       >
         Tests Record
       </Typography>
+
       <Select
         id="manage-sample-select"
         value={SampType}

@@ -7,6 +7,7 @@ import "react-phone-input-2/lib/style.css";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import CookieService from "../../Service/CookieService";
+
 import axios from "axios";
 
 const style = {
@@ -14,6 +15,7 @@ const style = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    marginTop: "30px",
   },
   name: {
     display: "flex",
@@ -50,6 +52,7 @@ function Edituser({ UserData, HandleEdit, update }) {
   const [imageValue, setImageValue] = useState();
   const [phoneValue, setphoneValue] = useState(UserData.mobile);
   const [roles, setRoles] = useState([]);
+
   const validationSchema = yup.object({
     firstname: yup
       .string()
@@ -104,6 +107,7 @@ function Edituser({ UserData, HandleEdit, update }) {
       .catch((error) => {
         console.log(error);
         if (error) {
+          console.log(error);
           setMessage(error.response.data.message);
           setDisplay({ display: "inline", margin: "10px", color: "Red" });
         } else {
@@ -126,7 +130,7 @@ function Edituser({ UserData, HandleEdit, update }) {
       HandleSubmit(values);
     },
   });
-
+  console.log(update);
   useEffect(() => {
     const fetchroles = async () => {
       var config = {
@@ -302,6 +306,15 @@ function Edituser({ UserData, HandleEdit, update }) {
             style={style.submit}
           >
             Submit
+          </Button>
+          <Button
+            size="large"
+            onClick={() => HandleEdit(false)}
+            variant="contained"
+            color="primary"
+            style={style.submit}
+          >
+            Back
           </Button>
         </div>
       </form>

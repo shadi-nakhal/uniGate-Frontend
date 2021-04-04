@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { XGrid } from "@material-ui/x-grid";
 import { Button } from "@material-ui/core";
 import CookieService from "../../Service/CookieService";
+import UserContext from "../../Service/UserContext";
 import Typography from "@material-ui/core/Typography";
-import NativeSelect from "@material-ui/core/NativeSelect";
 import EditProject from "./Editproject";
 import axios from "axios";
 
 function ManageProject() {
+  const { setUser, user } = useContext(UserContext);
   const [Project, setProject] = useState([]);
   const [Loading, setLoading] = useState(true);
   const [Editing, setEditing] = useState(false);
@@ -166,44 +167,51 @@ function ManageProject() {
     //     </NativeSelect>
     //   ),
     // },
-    {
-      field: "edit",
-      headerName: "Edit",
-      renderCell: (params) => (
-        <Button
-          style={{ backgroundColor: "#36C14B" }}
-          variant="outlined"
-          color="light"
-          size="small"
-          alt="edit"
-          onClick={() => {
-            setProjectData(Project[params.value.index]);
-            setEditing(true);
-          }}
-        >
-          Edit
-        </Button>
-      ),
-    },
-    {
-      field: "delete",
-      headerName: "Delete",
-      sortable: false,
-      renderCell: (params) => (
-        <Button
-          onClick={() => DeleteProject(params.value.id)}
-          style={{
-            backgroundColor: "#F76363",
-          }}
-          variant="contained"
-          size="small"
-          alt="delete"
-        >
-          Delete
-        </Button>
-      ),
-    },
   ];
+
+  if (user.user.role == "Head of lab") {
+    let con = [
+      {
+        field: "edit",
+        headerName: "Edit",
+        renderCell: (params) => (
+          <Button
+            style={{ backgroundColor: "#36C14B" }}
+            variant="outlined"
+            color="light"
+            size="small"
+            alt="edit"
+            onClick={() => {
+              setProjectData(Project[params.value.index]);
+              setEditing(true);
+            }}
+          >
+            Edit
+          </Button>
+        ),
+      },
+      {
+        field: "delete",
+        headerName: "Delete",
+        sortable: false,
+        renderCell: (params) => (
+          <Button
+            onClick={() => DeleteProject(params.value.id)}
+            style={{
+              backgroundColor: "#F76363",
+            }}
+            variant="contained"
+            size="small"
+            alt="delete"
+          >
+            Delete
+          </Button>
+        ),
+      },
+    ];
+
+    columns.splice(1, 0, ...con);
+  }
 
   if (Editing) {
     return (
@@ -215,7 +223,7 @@ function ManageProject() {
     return (
       <div>
         <Typography className={ProjectTable.title} component="h1" variant="h5">
-          Projects Manager
+          Projects Book
         </Typography>
         <div className={ProjectTable.ProjectTable}>
           <XGrid

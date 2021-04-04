@@ -5,6 +5,7 @@ import Avatar from "@material-ui/core/Avatar";
 import { Button } from "@material-ui/core";
 import CookieService from "../../Service/CookieService";
 import Typography from "@material-ui/core/Typography";
+import AlertDialog from "./confirmation";
 import EditUser from "./Edituser";
 import axios from "axios";
 
@@ -13,6 +14,18 @@ function ManageUser({ update }) {
   const [Loading, setLoading] = useState(true);
   const [Editing, setEditing] = useState(false);
   const [UserData, setUserData] = useState({});
+  const [Dialog, setDialog] = useState(false);
+  const [delId, setdelId] = useState("");
+
+  const handleClickOpen = (id) => {
+    setDialog(true);
+    setdelId(id);
+  };
+
+  const handleClose = () => {
+    setDialog(false);
+    setdelId("");
+  };
   const useStyles = makeStyles((theme) => ({
     usersTable: {
       zIndex: "0",
@@ -63,11 +76,11 @@ function ManageUser({ update }) {
     setLoading(false);
   };
 
-  const DeleteUser = async (id) => {
+  const Delete = async () => {
     setLoading(true);
     var config = {
       method: "Delete",
-      url: `/user/${id}`,
+      url: `/user/${delId}`,
       headers: {
         Authorization: `Bearer ${cookie}`,
         "Content-Type": "application/x-www-form-urlencoded",
@@ -141,7 +154,7 @@ function ManageUser({ update }) {
       sortable: false,
       renderCell: (params) => (
         <Button
-          onClick={() => DeleteUser(params.value.id, params.value.image)}
+          onClick={() => handleClickOpen(params.value.id)}
           style={{ backgroundColor: "#F76363" }}
           variant="contained"
           size="small"
@@ -165,6 +178,11 @@ function ManageUser({ update }) {
         <Typography className={usersTable.title} component="h1" variant="h5">
           Users Manager
         </Typography>
+        <AlertDialog
+          handleClose={handleClose}
+          Delete={Delete}
+          Dialog={Dialog}
+        />
         <div className={usersTable.usersTable}>
           <XGrid
             pagination

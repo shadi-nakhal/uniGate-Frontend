@@ -14,6 +14,7 @@ function Navbar({ checksidebar, forwardedRef, isVisible, update }) {
   useEffect(() => {
     async function load() {
       const cookie = Cookie.get("Bearer");
+      const inOneHour = new Date(new Date().getTime() + 60 * 60 * 1000);
       var config = {
         method: "get",
         url: "/profile",
@@ -25,6 +26,10 @@ function Navbar({ checksidebar, forwardedRef, isVisible, update }) {
       await axios(config)
         .then((res) => {
           setUser(res.data);
+          Cookie.set("role", res.data.user.role, {
+            Path: "/",
+            maxAge: inOneHour,
+          });
         })
         .catch((err) => {
           console.log(err, "navbar profile");
@@ -32,7 +37,6 @@ function Navbar({ checksidebar, forwardedRef, isVisible, update }) {
     }
     load();
   }, [update, setUser]);
-
   return (
     <IconContext.Provider value={{ color: isVisible ? "#ADBCBA" : "#59ecdb" }}>
       <div className="navbarr">
@@ -48,7 +52,7 @@ function Navbar({ checksidebar, forwardedRef, isVisible, update }) {
             Un<span style={{ color: "#FF2A00" }}>i</span>Gate
           </h4>
         </div>
-        <UserMenu user={user.user} />
+        <UserMenu user={user} />
       </div>
     </IconContext.Provider>
   );

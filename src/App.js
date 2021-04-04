@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Sidebar from "./Components/Sidebar/sidebar.js";
 import items from "./Components/Sidebar/SidebarData.js";
+import Itemss from "./Components/Sidebar/SidebarData2.js";
 import Navbar from "./Components/Navbar/Navbar.js";
 import useVisible from "./Service/useVisible";
 import Login from "./Pages/login/login";
@@ -10,15 +11,23 @@ import Manageclients from "./Pages/Clients/Manageclients";
 import UserContext from "./Service/UserContext";
 import Protection from "./Pages/login/Protection";
 import MyAccount from "./Pages/Users/MyAccount";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Redirect,
+  Route,
+  Switch,
+} from "react-router-dom";
 import axios from "axios";
 import ManageUser from "./Pages/Users/Manageuser.js";
 import NewProject from "./Pages/Projects/Newproject";
-import ManageProject from "./Pages/Projects/Manageproject";
+import ManageProjects from "./Pages/Projects/Manageproject";
 import NewSample from "./Pages/Sample/NewSample/Newsample"; //newsample
 import ManageSample from "./Pages/Sample/ManageSamples/ManageSample";
 import Tasks from "./Pages/Tasks/ManageTasks/ManageTasks";
 import TestRecords from "./Pages/Tests/TestRecords/TestRecords";
+import NotFound from "./Pages/NotFound/NotFound";
+import routes from "./Pages/login/routes";
+import RoleBasedRouting from "./Pages/login/RoleBasedRouting";
 
 require("dotenv").config();
 
@@ -26,7 +35,7 @@ function App() {
   const { ref, ref2, isVisible, setIsVisible } = useVisible(false);
   const [update, setupdate] = useState(false);
   const [user, setUser] = useState({
-    user: { image: "avatar", firstname: "", lastname: "" },
+    user: { image: "avatar", firstname: "", lastname: "", role: "" },
   });
 
   if (user) {
@@ -39,6 +48,7 @@ function App() {
   const checksidebar = () => {
     setIsVisible(!isVisible);
   };
+
   const triggerupdate = () => {
     setupdate(!update);
   };
@@ -60,53 +70,91 @@ function App() {
               </Route>
               <Protection>
                 <Navbar
-                  items={items}
+                  items={Itemss(user)}
                   checksidebar={checksidebar}
                   isVisible={isVisible}
                   forwardedRef={ref2}
                   update={update}
                 />
                 <Sidebar
-                  items={items}
+                  items={Itemss(user)}
                   checksidebar={checksidebar}
                   forwardedRef={ref}
                   isVisible={isVisible}
                 />
-                <Route exact path="/newuser">
-                  <NewUser />
-                </Route>
-                <Route exact path="/ManageUsers">
-                  <ManageUser update={triggerupdate} />
-                </Route>
-                <Route exact path="/MyAccount">
-                  <MyAccount UserData={user.user} update={triggerupdate} />
-                </Route>
-                <Route exact path="/Newclient">
-                  <Newclient />
-                </Route>
-                <Route exact path="/ManageClients">
-                  <Manageclients />
-                </Route>
-                <Route exact path="/NewProject">
-                  <NewProject />
-                </Route>
-                <Route exact path="/ManageProjects">
-                  <ManageProject />
-                </Route>
-                <Route exact path="/NewSample">
-                  <NewSample />
-                </Route>
-                <Route exact path="/ManageSamples">
-                  <ManageSample />
-                </Route>
-                <Route exact path="/ManageTasks">
-                  <Tasks />
-                </Route>
-                <Route exact path="/">
-                  <TestRecords />
-                </Route>
+                <RoleBasedRouting
+                  exact
+                  path="/ManageTasks"
+                  component={Tasks}
+                  roles={["Head of lab", "Technician"]}
+                />
+                <RoleBasedRouting
+                  exact
+                  path="/"
+                  component={TestRecords}
+                  roles={["Technician", "Head of lab"]}
+                />
+                <RoleBasedRouting
+                  exact
+                  path="/MyAccount"
+                  component={MyAccount}
+                  UserData={user.user}
+                  update={triggerupdate}
+                  roles={["Head of lab", "Technician"]}
+                />
+                <RoleBasedRouting
+                  exact
+                  path="/ManageProjects"
+                  component={ManageProjects}
+                  roles={["Head of lab", "Technician"]}
+                />
+                <RoleBasedRouting
+                  exact
+                  path="/NewSample"
+                  component={NewSample}
+                  roles={["Head of lab", "Technician"]}
+                />
+                <RoleBasedRouting
+                  exact
+                  path="/ManageSamples"
+                  component={ManageSample}
+                  roles={["Head of lab", "Technician"]}
+                />
+                <RoleBasedRouting
+                  exact
+                  path="/newuser"
+                  component={NewUser}
+                  roles={["Head of lab"]}
+                />
+                <RoleBasedRouting
+                  exact
+                  path="/ManageUsers"
+                  component={ManageUser}
+                  roles={["Head of lab"]}
+                  update={triggerupdate}
+                />
+
+                <RoleBasedRouting
+                  exact
+                  path="/Newclient"
+                  component={Newclient}
+                  roles={["Head of lab"]}
+                />
+                <RoleBasedRouting
+                  exact
+                  path="/ManageClients"
+                  component={Manageclients}
+                  roles={["Head of lab"]}
+                />
+                <RoleBasedRouting
+                  exact
+                  path="/NewProject"
+                  component={NewProject}
+                  roles={["Head of lab"]}
+                />
               </Protection>
             </Switch>
+            <Redirect from="/*" to="/" />
           </Router>
         </div>
       </UserContext.Provider>

@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { XGrid } from "@material-ui/x-grid";
 import { Button } from "@material-ui/core";
 import CookieService from "../../Service/CookieService";
+import UserContext from "../../Service/UserContext";
 import Typography from "@material-ui/core/Typography";
 import NativeSelect from "@material-ui/core/NativeSelect";
 import EditClient from "./Editclient";
 import axios from "axios";
 
 function ManageClient() {
+  const { setUser, user } = useContext(UserContext);
   const [Client, setClient] = useState([]);
   const [Loading, setLoading] = useState(true);
   const [Editing, setEditing] = useState(false);
@@ -106,7 +108,7 @@ function ManageClient() {
     {
       field: "address",
       headerName: "Address",
-      width: 230,
+      width: 400,
     },
     {
       field: "projects",
@@ -129,42 +131,49 @@ function ManageClient() {
         </NativeSelect>
       ),
     },
-    {
-      field: "edit",
-      headerName: "Edit",
-      renderCell: (params) => (
-        <Button
-          style={{ backgroundColor: "#36C14B" }}
-          variant="outlined"
-          color="light"
-          size="small"
-          alt="edit"
-          onClick={() => {
-            setClientData(Client[params.value.index]);
-            setEditing(true);
-          }}
-        >
-          Edit
-        </Button>
-      ),
-    },
-    {
-      field: "delete",
-      headerName: "Delete",
-      sortable: false,
-      renderCell: (params) => (
-        <Button
-          onClick={() => DeleteClient(params.value.id)}
-          style={{ backgroundColor: "#F76363" }}
-          variant="contained"
-          size="small"
-          alt="delete"
-        >
-          Delete
-        </Button>
-      ),
-    },
   ];
+
+  if (user.user.role == "Head of lab") {
+    let con = [
+      {
+        field: "edit",
+        headerName: "Edit",
+        renderCell: (params) => (
+          <Button
+            style={{ backgroundColor: "#36C14B" }}
+            variant="outlined"
+            color="light"
+            size="small"
+            alt="edit"
+            onClick={() => {
+              setClientData(Client[params.value.index]);
+              setEditing(true);
+            }}
+          >
+            Edit
+          </Button>
+        ),
+      },
+      {
+        field: "delete",
+        headerName: "Delete",
+        sortable: false,
+        renderCell: (params) => (
+          <Button
+            onClick={() => DeleteClient(params.value.id)}
+            style={{ backgroundColor: "#F76363" }}
+            variant="contained"
+            size="small"
+            alt="delete"
+          >
+            Delete
+          </Button>
+        ),
+      },
+    ];
+    let index = columns.length;
+    columns.splice(index, 0, ...con);
+  }
 
   if (Editing) {
     return (
@@ -176,7 +185,7 @@ function ManageClient() {
     return (
       <div>
         <Typography className={ClientTable.title} component="h1" variant="h5">
-          Clients Manager
+          Clients Book
         </Typography>
         <div className={ClientTable.ClientTable}>
           <XGrid

@@ -484,7 +484,7 @@ function EditProject({ ProjectData, HandleEdit }) {
             color="primary"
             style={style.submit}
           >
-            Sign Up
+            Submit
           </Button>
         </div>
       </form>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "@material-ui/core/Button";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -6,12 +6,25 @@ import Fade from "@material-ui/core/Fade";
 import Cookie from "../../Service/CookieService";
 import Avatar from "@material-ui/core/Avatar";
 import { useHistory } from "react-router-dom";
+import { makeStyles } from "@material-ui/core/styles";
+import Badge from "@material-ui/core/Badge";
+import MailIcon from "@material-ui/icons/Mail";
 import axios from "axios";
 
 export default function FadeMenu({ user }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const history = useHistory();
+
+  const useStyles = makeStyles((theme) => ({
+    root: {
+      "& > *": {
+        margin: theme.spacing(2),
+        color: "gray",
+      },
+    },
+  }));
+  const classes = useStyles();
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -33,17 +46,31 @@ export default function FadeMenu({ user }) {
     axios(config)
       .then((res) => {
         Cookie.remove("Bearer");
+        Cookie.remove("role");
         window.location.replace("/");
       })
       .catch((err) => {
         console.log(err, "errorrr in logout navbar");
         Cookie.remove("Bearer");
+        Cookie.remove("role");
         window.location.replace("/");
       });
   };
 
   return (
-    <div>
+    <div style={{ display: "flex" }}>
+      {/* <div className={classes.root}>
+        <Badge
+          style={{ cursor: "pointer" }}
+          color="secondary"
+          badgeContent={user.count}
+          onClick={() => {
+            history.push("/ManageTasks");
+          }}
+        >
+          <MailIcon />
+        </Badge>
+      </div> */}
       <Button
         aria-controls="fade-menu"
         disableFocusRipple
@@ -67,10 +94,10 @@ export default function FadeMenu({ user }) {
             fontSize: "10px",
           }}
           alt="image"
-          src={"http://localhost:8000/storage/images/" + user.image}
+          src={"http://localhost:8000/storage/images/" + user.user.image}
         />
         <span style={{ fontSize: "12px" }}>
-          {user.firstname + " " + user.lastname}
+          {user.user.firstname + " " + user.user.lastname}
         </span>
       </Button>
       <Menu

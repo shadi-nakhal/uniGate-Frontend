@@ -3,6 +3,7 @@ import ReactDataGrid from "react-data-grid";
 import Button from "@material-ui/core/Button";
 import CookieService from "../../../../Service/CookieService";
 import Chip from "@material-ui/core/Chip";
+import AlertDialog from "../confirmation";
 import axios from "axios";
 
 const Grid = React.memo(
@@ -15,13 +16,33 @@ const Grid = React.memo(
       resizable: true,
     };
 
+    const [Dialog, setDialog] = useState(false);
+    const [delId, setdelId] = useState("");
+
+    const handleClickOpen = (id) => {
+      setDialog(true);
+      setdelId(id);
+    };
+
+    const handleClose = () => {
+      setDialog(false);
+      setdelId("");
+    };
+
     const ProgressBarFormatter = ({ value }) => {
       return (
         <Chip
-          label={value ? "Completed" : "Pending"}
+          label={value}
           size="small"
           style={{
-            backgroundColor: value ? "green" : "#E2F43F",
+            backgroundColor:
+              value == "Completed"
+                ? "green"
+                : value == "Over due"
+                ? "red"
+                : value == "Pending"
+                ? "blue"
+                : "#E2F43F",
             color: "black",
             width: "150px",
           }}
@@ -29,10 +50,10 @@ const Grid = React.memo(
       );
     };
 
-    const DeleteTask = async (id) => {
+    const Delete = async () => {
       var config = {
         method: "Delete",
-        url: `/task/${id}`,
+        url: `/task/${delId}`,
         headers: {
           Authorization: `Bearer ${cookie}`,
           "Content-Type": "application/x-www-form-urlencoded",
@@ -66,7 +87,7 @@ const Grid = React.memo(
           icon: (
             <Button
               style={{ backgroundColor: "#F76363" }}
-              onClick={() => DeleteTask(val)}
+              onClick={() => handleClickOpen(val)}
               variant="contained"
               size="small"
             >
@@ -93,6 +114,7 @@ const Grid = React.memo(
       { key: "sample_ref", name: "Sample Reference" },
       { key: "status", name: " status", formatter: ProgressBarFormatter },
       { key: "created_at", name: "created_at" },
+      { key: "test_date", name: "Test date", width: 170 },
       { key: "delete", name: "delete", width: 70 },
     ].map((c) => ({ ...c, ...defaultColumnProperties }));
 
@@ -108,13 +130,13 @@ const Grid = React.memo(
       await axios(config)
         .then((res) => {
           console.log(res);
-          setRows(res.data);
+          setRows(res.data.data);
         })
         .catch((err) => {
           console.log(err);
         });
     };
-
+    console.log(rows);
     useEffect(() => {
       fetchSelectData();
     }, [update]);
@@ -128,6 +150,11 @@ const Grid = React.memo(
           textAlign: "center",
         }}
       >
+        <AlertDialog
+          handleClose={handleClose}
+          Delete={Delete}
+          Dialog={Dialog}
+        />
         <ReactDataGrid
           columns={columns}
           getCellActions={getCellActions}

@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useContext,
+} from "react";
 import { XGrid } from "@material-ui/x-grid";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
@@ -6,9 +12,11 @@ import CookieService from "../../../Service/CookieService";
 import NativeSelect from "@material-ui/core/NativeSelect";
 import TestAssignment from "./TestAssignment/TestAssignment";
 import Typography from "@material-ui/core/Typography";
+import UserContext from "../../../Service/UserContext";
 import Chip from "@material-ui/core/Chip";
 import axios from "axios";
 import Select from "react-select";
+import AlertDialog from "./confirmation";
 
 const customStyles = {
   menu: (provided, state) => ({
@@ -35,6 +43,7 @@ const customStyles = {
 };
 
 function ManageSample({ update }) {
+  const { setUser, user } = useContext(UserContext);
   const [Samples, setSamples] = useState([]);
   const [Loading, setLoading] = useState(true);
   const [Editing, setEditing] = useState(false);
@@ -55,7 +64,7 @@ function ManageSample({ update }) {
       width: "100%",
     },
     title: {
-      marginTop: "1%",
+      marginTop: "2%",
       textAlign: "center",
     },
     selectEmpty: {
@@ -65,6 +74,32 @@ function ManageSample({ update }) {
   }));
   const SamplesTable = useStyles();
   const cookie = CookieService.get("Bearer");
+  const [Dialog, setDialog] = useState(false);
+  const [delId, setdelId] = useState("");
+
+  const [message, setMessage] = useState("");
+  const [display, setDisplay] = useState({
+    display: "none",
+    margin: "10px",
+    color: "Red",
+  });
+
+  const HandleDisplay = useCallback(
+    (e) => {
+      setDisplay(e);
+    },
+    [display]
+  );
+
+  const handleClickOpen = (id) => {
+    setDialog(true);
+    setdelId(id);
+  };
+
+  const handleClose = () => {
+    setDialog(false);
+    setdelId("");
+  };
 
   useEffect(() => {
     async function LoadSamplesType() {
@@ -132,10 +167,10 @@ function ManageSample({ update }) {
     setLoading(false);
   };
 
-  const DeleteSample = async (id) => {
+  const Delete = async () => {
     var config = {
       method: "Delete",
-      url: `/${SampType}/${id}`,
+      url: `/${SampType.value}/${delId}`,
       headers: {
         Authorization: `Bearer ${cookie}`,
         "Content-Type": "application/x-www-form-urlencoded",
@@ -144,19 +179,38 @@ function ManageSample({ update }) {
     await axios(config)
       .then((res) => {
         setmeta(res.data.meta);
+        setDisplay({
+          display: "none",
+          margin: "10px",
+          color: "Red",
+        });
         setSamples(
           res.data.data.map((item, index) => {
             return {
               ...item,
               delete: { id: item.id },
               assign: { id: item.id, index: index },
-              status: { id: item.id, index: index, tasks: item.status },
             };
           })
         );
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
+        console.log(error);
+        if (error.response.data.errors) {
+          setMessage(
+            Object.entries(error.response.data.errors).map(
+              (item) => " " + item[1] + ","
+            )
+          );
+          setDisplay({
+            display: "inline",
+            margin: "10px",
+            color: "Red",
+          });
+        } else {
+          setMessage("N e t w o r k  E r r o r");
+          setDisplay({ display: "inline", margin: "10px", color: "Red" });
+        }
       });
   };
 
@@ -165,25 +219,6 @@ function ManageSample({ update }) {
   }, [SampType, pageNumber, Editing]);
 
   const columns = useMemo(() => [
-    {
-      field: "assign",
-      headerName: "Assign",
-      renderCell: (params) => (
-        <Button
-          style={{ backgroundColor: "#36C14B" }}
-          variant="contained"
-          size="small"
-          alt="Remy Sharp"
-          onClick={() => {
-            setSampleData(params.row);
-            setEditing(true);
-          }}
-        >
-          Assign
-        </Button>
-      ),
-    },
-
     // {
     //   field: "edit",
     //   headerName: "Edit",
@@ -204,22 +239,6 @@ function ManageSample({ update }) {
     //   ),
     // },
 
-    {
-      field: "delete",
-      headerName: "Delete",
-      sortable: false,
-      renderCell: (params) => (
-        <Button
-          onClick={() => DeleteSample(params.value.id)}
-          style={{ backgroundColor: "#F76363" }}
-          variant="contained"
-          size="small"
-          alt="Remy Sharp"
-        >
-          Delete
-        </Button>
-      ),
-    },
     { field: "id", headerName: "ID", width: 65 },
     { field: "ref", headerName: "Reference", width: 120 },
     {
@@ -305,6 +324,53 @@ function ManageSample({ update }) {
 
     columns.splice(6, 0, ...con);
   }
+  if (user.user.role == "Head of lab") {
+    let con = [
+      {
+        field: "delete",
+        headerName: "Delete",
+        sortable: false,
+        renderCell: (params) => (
+          <Button
+            onClick={() => handleClickOpen(params.value.id)}
+            style={{ backgroundColor: "#F76363" }}
+            variant="contained"
+            size="small"
+            alt="Remy Sharp"
+          >
+            Delete
+          </Button>
+        ),
+      },
+    ];
+
+    columns.splice(0, 0, ...con);
+  }
+
+  if (user.user.role == "Head of lab" || user.user.role == "Technician") {
+    let con = [
+      {
+        field: "assign",
+        headerName: "Assign",
+        renderCell: (params) => (
+          <Button
+            style={{ backgroundColor: "#36C14B" }}
+            variant="contained"
+            size="small"
+            alt="Remy Sharp"
+            onClick={() => {
+              setSampleData(params.row);
+              setEditing(true);
+            }}
+          >
+            Assign
+          </Button>
+        ),
+      },
+    ];
+
+    columns.splice(0, 0, ...con);
+  }
 
   const options = Types.map((item, index) => ({ value: item, label: item }));
 
@@ -324,12 +390,20 @@ function ManageSample({ update }) {
         <Typography className={SamplesTable.title} component="h1" variant="h5">
           Samples Manager
         </Typography>
+        <div style={{ textAlign: "center" }}>
+          {<span style={display}>{message}</span>}
+        </div>
         <Select
           id="manage-sample-select"
           value={SampType}
           onChange={HandleTypes}
           options={options}
           styles={customStyles}
+        />
+        <AlertDialog
+          handleClose={handleClose}
+          Delete={Delete}
+          Dialog={Dialog}
         />
         <div className={SamplesTable.SamplesTable}>
           <XGrid

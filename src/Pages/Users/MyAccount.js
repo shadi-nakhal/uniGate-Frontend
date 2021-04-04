@@ -15,6 +15,7 @@ const style = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    marginTop: "10px",
   },
   name: {
     display: "flex",
@@ -117,7 +118,13 @@ function Edituser({ UserData, update }) {
       .catch((error) => {
         console.log(error);
         if (error) {
-          setMessage("uh oh you broke it ! now you have to buy it !");
+          if (error.response.data.errors) {
+            setMessage(
+              Object.entries(error.response.data.errors).map(
+                (item) => " " + item[1] + ","
+              )
+            );
+          }
           setDisplay({ display: "inline", margin: "10px", color: "Red" });
         } else {
           console.log(error);
@@ -335,6 +342,15 @@ function Edituser({ UserData, update }) {
             style={style.submit}
           >
             Submit
+          </Button>
+          <Button
+            size="large"
+            onClick={() => history.push("/")}
+            variant="contained"
+            color="primary"
+            style={style.submit}
+          >
+            Back
           </Button>
         </div>
       </form>
