@@ -218,6 +218,7 @@ const TestRecords = React.memo(() => {
       />
       <ReactDataGrid
         columns={columns}
+        minHeight={500}
         getCellActions={getCellActions}
         rowGetter={(i) => {
           return rows[i];

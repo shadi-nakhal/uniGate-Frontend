@@ -43,10 +43,10 @@ const Tasks = React.memo(() => {
             value == "Completed"
               ? "green"
               : value == "Over due"
-              ? "red"
+              ? "#ff8787"
               : value == "Pending"
-              ? "blue"
-              : "#E2F43F",
+              ? "#5c7cfa"
+              : "#fab005",
           color: "black",
           width: "150px",
         }}
@@ -164,7 +164,7 @@ const Tasks = React.memo(() => {
         <ReactDataGrid
           columns={columns}
           getCellActions={getCellActions}
-          minHeight={400}
+          minHeight={500}
           rowGetter={(i) => {
             return rows[i];
           }}

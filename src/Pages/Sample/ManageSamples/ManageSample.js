@@ -251,13 +251,13 @@ function ManageSample({ update }) {
         const colors = () => {
           switch (state) {
             case "Warning":
-              return "#E2F43F";
+              return "#fab005";
             case "Completed":
               return "green";
             case "Pending":
-              return "blue";
+              return "#5c7cfa";
             case "Over due":
-              return "red";
+              return "#ff8787";
           }
         };
         return (
@@ -360,7 +360,7 @@ function ManageSample({ update }) {
             alt="Remy Sharp"
             onClick={() => {
               setSampleData(params.row);
-              setEditing(true);
+               setEditing(true);
             }}
           >
             Assign

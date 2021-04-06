@@ -38,6 +38,7 @@ const comp2 = React.memo(({ SampleData, HandleEdit }) => {
 
   useEffect(() => {
     const fetchSelectData = async () => {
+
       var config = {
         method: "get",
         url: `/testselection/${SampleData.type}`,
@@ -48,6 +49,7 @@ const comp2 = React.memo(({ SampleData, HandleEdit }) => {
       };
       await axios(config)
         .then((res) => {
+          console.log(res.data)
           setSelectData(res.data);
         })
         .catch((err) => {
@@ -103,7 +105,7 @@ const comp2 = React.memo(({ SampleData, HandleEdit }) => {
         }
       });
   });
-  console.log(SampleData);
+
 
   const validationSchema = yup.object({
     technician_id: yup.string().required(" Technician name is required"),
